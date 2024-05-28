@@ -19,7 +19,7 @@ let loop = false;
 
 const app = express();
 const port = process.env.PORT || 4010;
-app.get('/', (req: any, res: any) => {
+app.get('/', (req, res) => {
     res.send({
         running: true
     });
