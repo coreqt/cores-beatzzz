@@ -3,6 +3,8 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerSta
 const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const { getVoiceConnection } = require('@discordjs/voice');
+const express = require('express');
+const app = express();
 require('dotenv').config();
 const token = process.env.TOKEN;
 
@@ -15,6 +17,11 @@ let currentPlaying = null;
 let connection = null;
 let player = createAudioPlayer();
 let loop = false;
+
+app.get('/', (req, res)=>{
+    res.send({code: 200});
+})
+app.listen(4000);
 
 client.once('ready', () => {
     console.log('Bot is online!');
