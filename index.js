@@ -4,7 +4,6 @@ const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const { getVoiceConnection } = require('@discordjs/voice');
 const express = require('express');
-const app = express();
 require('dotenv').config();
 const token = process.env.TOKEN;
 
@@ -18,10 +17,14 @@ let connection = null;
 let player = createAudioPlayer();
 let loop = false;
 
-app.get('/', (req, res)=>{
-    res.send({code: 200});
-})
-app.listen(4000);
+const app = express();
+const port = process.env.PORT || 4010;
+app.get('/', (req: any, res: any) => {
+    res.send({
+        running: true
+    });
+});
+app.listen(port);
 
 client.once('ready', () => {
     console.log('Bot is online!');
