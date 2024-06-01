@@ -201,6 +201,7 @@ async function playCurrent() {
             channelId: currentPlaying.voiceChannel,
             guildId: client.channels.cache.get(currentPlaying.voiceChannel).guild.id,
             adapterCreator: client.channels.cache.get(currentPlaying.voiceChannel).guild.voiceAdapterCreator,
+            selfDeaf: false
         });
         connection.subscribe(player);
     }
