@@ -62,18 +62,24 @@ client.on('messageCreate', async message => {
             return message.channel.send('Please provide a YouTube link or song name.');
         }
 
+        const voiceChannel = message.member.voice.channel;
+        if (!voiceChannel) {
+            return message.channel.send('You need to be in a voice channel to play music!');
+        }
+
         const query = args.join(' ');
 
         if (ytdl.validateURL(query)) {
-            queue.push({ url: query, textChannel: message.channel.id, voiceChannel: message.member.voice.channel.id });
-            message.channel.send(`Added to queue: ${query}`);
+            const songInfo = await ytdl.getInfo(query);
+            queue.push({ url: query, title: songInfo.videoDetails.title, textChannel: message.channel.id, voiceChannel: voiceChannel.id });
+            message.channel.send(`Added to queue: **${songInfo.videoDetails.title}**`);
             if (!currentPlaying) {
                 playNext();
             }
         } else if (ytpl.validateID(query)) {
             const playlist = await ytpl(query);
-            playlist.items.forEach(item => queue.push({ url: item.shortUrl, textChannel: message.channel.id, voiceChannel: message.member.voice.channel.id }));
-            message.channel.send(`Added playlist to queue: ${playlist.title}`);
+            playlist.items.forEach(item => queue.push({ url: item.shortUrl, title: item.title, textChannel: message.channel.id, voiceChannel: voiceChannel.id }));
+            message.channel.send(`Added playlist to queue: **${playlist.title}**`);
             if (!currentPlaying) {
                 playNext();
             }
@@ -81,8 +87,8 @@ client.on('messageCreate', async message => {
             const searchResult = await ytSearch(query);
             if (searchResult && searchResult.videos.length > 0) {
                 const video = searchResult.videos[0];
-                queue.push({ url: video.url, textChannel: message.channel.id, voiceChannel: message.member.voice.channel.id });
-                message.channel.send(`Added to queue: ${video.title}`);
+                queue.push({ url: video.url, title: video.title, textChannel: message.channel.id, voiceChannel: voiceChannel.id });
+                message.channel.send(`Added to queue: **${video.title}**`);
                 if (!currentPlaying) {
                     playNext();
                 }
@@ -119,7 +125,7 @@ client.on('messageCreate', async message => {
         } else {
             message.channel.send('No previous track to play.');
         }
-    }else if (command === 'remove') {
+    } else if (command === 'remove') {
         if (args.length === 0) {
             return message.channel.send('Please provide the position of the song to remove from the queue.');
         }
@@ -131,15 +137,15 @@ client.on('messageCreate', async message => {
         }
 
         const removedSong = queue.splice(position - 1, 1)[0];
-        message.channel.send(`Removed song at position ${position} from the queue: ${removedSong.url}`);
-    }else if (command === 'queue') {
+        message.channel.send(`Removed song at position ${position} from the queue: **${removedSong.title}**`);
+    } else if (command === 'queue') {
         if (queue.length === 0) {
             return message.channel.send('The queue is empty.');
         }
 
-        const queueList = queue.map((song, index) => `${index + 1}. ${song.url}`).join('\n');
+        const queueList = queue.map((song, index) => `${index + 1}. **${song.title}**`).join('\n');
         message.channel.send(`Current queue:\n${queueList}`);
-    }else if (command === 'help') {
+    } else if (command === 'help') {
         const helpEmbed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('Music Bot Commands')
@@ -151,6 +157,8 @@ client.on('messageCreate', async message => {
                 { name: '!loopall', value: 'Toggle looping the entire queue.' },
                 { name: '!next', value: 'Skip to the next track in the queue.' },
                 { name: '!previous', value: 'Play the previous track from the history.' },
+                { name: '!queue', value: 'Display the current queue.' },
+                { name: '!remove <position>', value: 'Remove a song from the queue at the specified position.' },
                 { name: '!help', value: 'Show this help message.' }
             )
             .setFooter({text:'Enjoy your music!'});
@@ -181,12 +189,12 @@ async function playNext(skip = false) {
     playCurrent();
 }
 
-
 async function playCurrent() {
     const stream = ytdl(currentPlaying.url, {
         filter: 'audioonly',
         quality: 'highestaudio',
-        highWaterMark: 1 << 25
+        highWaterMark: 1 << 27, // Increased buffer size for better audio quality
+        dlChunkSize: 0 // Fetch the entire audio stream at once
     });
     
     const resource = createAudioResource(stream, {
@@ -206,7 +214,8 @@ async function playCurrent() {
         connection.subscribe(player);
     }
 
-    client.channels.cache.get(currentPlaying.textChannel).send(`Now playing: ${currentPlaying.url}`);
+    client.channels.cache.get(currentPlaying.textChannel).send(`Now playing: **${currentPlaying.title}**`);
 }
+
 
 client.login(token);
