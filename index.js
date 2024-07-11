@@ -29,7 +29,9 @@ let loopAll = false;
 app.get('/', (req, res) => {
     res.send({ code: 200 });
 });
-app.listen(4000);
+const port = process.env.PORT || 3000;
+
+app.listen(port);
 
 client.once('ready', () => {
     console.log('Bot is online!');
