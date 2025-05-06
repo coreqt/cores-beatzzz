@@ -88,7 +88,8 @@ module.exports = {
                 query.startsWith('http') ? query : `ytsearch:${query}`,
                 '--no-playlist',
                 '--print-json',
-                '--skip-download'
+                '--skip-download',
+                '--cookies', '/etc/secrets/cookies.txt'
             ], { stdio: ['ignore', 'pipe', 'pipe'] });
             let infoData = '';
             info.stdout.on('data', chunk => infoData += chunk);

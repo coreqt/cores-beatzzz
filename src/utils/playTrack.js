@@ -27,7 +27,8 @@ module.exports = {
             '-o', '-',
             '--no-playlist',
             '--no-warnings',
-            '--quiet'
+            '--quiet',
+            '--cookies', '/etc/secrets/cookies.txt'
         ], { stdio: ['ignore', 'pipe', 'pipe'] });
         yt.stderr.on('data', data => {
             console.error(`yt-dlp error: ${data}`);
