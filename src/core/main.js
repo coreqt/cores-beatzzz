@@ -17,11 +17,18 @@ const client = new Client({
     ]
 });
 
-let player = createAudioPlayer({
-    behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause,
-    },
-});
+// let player = createAudioPlayer({
+//     behaviors: {
+//         noSubscriber: NoSubscriberBehavior.Pause,
+//     },
+// });
+
+client.queue = new Map();
+client.connections = new Map();
+client.players = new Map();
+client.processes = new Map();
+client.textChannels = new Map();
+
 
 const port = process.env.PORT || 3000;
 
@@ -85,7 +92,6 @@ eventList.forEach((event) =>{
 //         player.play();
 //     }
 // })
-
 
 
 module.exports = { client }
