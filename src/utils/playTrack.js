@@ -28,7 +28,7 @@ module.exports = {
             '--no-playlist',
             '--no-warnings',
             '--quiet',
-            '--cookies', '/etc/secrets/cookies.txt'
+            // '--cookies', '/etc/secrets/cookies.txt'
         ], { stdio: ['ignore', 'pipe', 'pipe'] });
         yt.stderr.on('data', data => {
             console.error(`yt-dlp error: ${data}`);
@@ -65,5 +65,6 @@ module.exports = {
         const resource = createAudioResource(ffmpeg.stdout, { inputType: StreamType.Raw });
         player.play(resource);
         client.processes.set(guildId, { yt, ffmpeg });
+        return;
     }
 } 

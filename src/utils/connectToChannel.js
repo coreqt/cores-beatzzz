@@ -1,5 +1,6 @@
 
 const { joinVoiceChannel, createAudioPlayer, entersState, VoiceConnectionStatus, AudioPlayerStatus  } = require("@discordjs/voice");
+const {playTrack} = require('./playTrack');
 
 /**
  * Connects the bot to a voice channel and sets up the audio player.
@@ -34,11 +35,11 @@ module.exports = {
             if (!guildQueue || guildQueue.length === 0) {
                 // No more songs: disconnect and clean up
                 connection.destroy();
-                queue.delete(guildId);
-                players.delete(guildId);
-                connections.delete(guildId);
-                processes.delete(guildId);
-                textChannels.delete(guildId);
+                client.queue.delete(guildId);
+                client.players.delete(guildId);
+                client.connections.delete(guildId);
+                client.processes.delete(guildId);
+                client.textChannels.delete(guildId);
                 return;
             }
             // Dequeue next song and play it
@@ -62,12 +63,13 @@ module.exports = {
                 playTrack(guildId, next.query, next.title);
             } else {
                 connection.destroy();
-                queue.delete(guildId);
-                players.delete(guildId);
-                connections.delete(guildId);
-                processes.delete(guildId);
-                textChannels.delete(guildId);
+                client.queue.delete(guildId);0
+                client.players.delete(guildId);
+                client.connections.delete(guildId);
+                client.processes.delete(guildId);
+                client.textChannels.delete(guildId);
             }
         });
+        return;
     }
 }

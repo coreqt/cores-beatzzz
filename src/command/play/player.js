@@ -1,5 +1,4 @@
-// const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } = require("@discordjs/voice");
-
+const { AudioPlayerStatus } = require("@discordjs/voice");
 const { spawn } = require("node:child_process");
 const { client } = require("../../core/main");
 const { playTrack } = require("../../utils/playTrack");
@@ -113,9 +112,11 @@ module.exports = {
         } else {
             // Otherwise, enqueue the track
             if (!client.queue.has(guildId)) client.queue.set(guildId, []);
-            queue.get(guildId).push({ query, title });
+            client.queue.get(guildId).push({ query, title });
             message.channel.send(`✅ Added to queue: **${title}**`);
         }
+
+        return;
 
     }
 }
