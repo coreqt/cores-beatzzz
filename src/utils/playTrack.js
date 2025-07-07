@@ -21,14 +21,14 @@ module.exports = {
         }
 
         // Spawn yt-dlp to fetch the audio stream
-        const yt = spawn('yt-dlp', [
+        const yt = spawn('yt-dlp.exe', [
             input,
             '-f', 'bestaudio',
             '-o', '-',
             '--no-playlist',
             '--no-warnings',
             '--quiet',
-            // '--cookies', '/etc/secrets/cookies.txt'
+            '--cookies', 'E:\Programming\github\core-beatzzz\cookies.txt'
         ], { stdio: ['ignore', 'pipe', 'pipe'] });
         yt.stderr.on('data', data => {
             console.error(`yt-dlp error: ${data}`);
@@ -51,9 +51,7 @@ module.exports = {
             console.error(`ffmpeg error: ${error.message}`);
         });
 
-        // Pipe the yt-dlp output into ffmpeg
         yt.stdout.pipe(ffmpeg.stdin);
-        // Handle EPIPE (broken pipe) errors gracefully
         yt.stdout.on('error', err => {
             if (err.code !== 'EPIPE') console.error('yt-dlp stdout error:', err);
         });
@@ -61,7 +59,6 @@ module.exports = {
             if (err.code !== 'EPIPE') console.error('ffmpeg stdout error:', err);
         });
 
-        // Create an audio resource from ffmpeg's output and play it
         const resource = createAudioResource(ffmpeg.stdout, { inputType: StreamType.Raw });
         player.play(resource);
         client.processes.set(guildId, { yt, ffmpeg });

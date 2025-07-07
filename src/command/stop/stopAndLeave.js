@@ -14,11 +14,13 @@ module.exports = {
         }
         // Clear the queue, stop playing, and disconnect
         client.queue.delete(guildId);
+        
         const procs = client.processes.get(guildId);
         if (procs) {
             procs.yt.kill('SIGKILL');
             procs.ffmpeg.kill('SIGKILL');
         }
+
         player.stop();
         client.connections.get(guildId)?.destroy();
         client.players.delete(guildId);
