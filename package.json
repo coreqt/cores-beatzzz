@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/coreqt/cores-beatzzz/issues"
   },
-  "homepage": "https://github.com/coreqt/cores-beatzzz#readme"
+  "homepage": "https://github.com/coreqt/cores-beatzzz#readme",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
 }
