@@ -1,21 +1,21 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, GatewayIntentBits } = require('discord.js-selfbot-v13');
+const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection, NoSubscriberBehavior } = require('@discordjs/voice');
 const {startServer} = require('./keepAlive.js');
 
  
-// const client = new Client({
-//     intents: [
-//         GatewayIntentBits.Guilds,
-//         GatewayIntentBits.GuildVoiceStates,
-//         GatewayIntentBits.GuildMessages,
-//         GatewayIntentBits.MessageContent
-//     ]
-// });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ]
+});
 
 
-const client = new Client();
+// const client = new Client();
 
 // let player = createAudioPlayer({
 //     behaviors: {
