@@ -4,7 +4,7 @@ const { Client, GatewayIntentBits } = require('discord.js-selfbot-v13');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection, NoSubscriberBehavior } = require('@discordjs/voice');
 const {startServer} = require('./keepAlive.js');
 
-
+ 
 // const client = new Client({
 //     intents: [
 //         GatewayIntentBits.Guilds,
