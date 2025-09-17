@@ -34,12 +34,12 @@ module.exports = {
 
         let title = query;
         try {
-            const info = spawn('yt-dlp.exe', [
+            const info = spawn('yt-dlp', [
                 query.startsWith('http') ? query : `ytsearch:${query}`,
                 '--no-playlist',
                 '--print-json',
                 '--skip-download',
-                '--cookies-from-browser', '/etc/secrets/cookies.txt'
+                // '--cookies-from-browser', '/etc/secrets/cookies.txt'
             ], { stdio: ['ignore', 'pipe', 'pipe'] });
             let infoData = '';
             info.stdout.on('data', chunk => infoData += chunk);

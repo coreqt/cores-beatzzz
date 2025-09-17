@@ -21,14 +21,14 @@ module.exports = {
         }
 
         // Spawn yt-dlp to fetch the audio stream
-        const yt = spawn('yt-dlp.exe', [
+        const yt = spawn('yt-dlp', [
             input,
             '-f', 'bestaudio',
             '-o', '-',
             '--no-playlist',
             '--no-warnings',
             '--quiet',
-            '--cookies', 'E:\Programming\github\core-beatzzz\cookies.txt'
+            // '--cookies', 'E:\Programming\github\core-beatzzz\cookies.txt'
         ], { stdio: ['ignore', 'pipe', 'pipe'] });
         yt.stderr.on('data', data => {
             console.error(`yt-dlp error: ${data}`);
