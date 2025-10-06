@@ -10,7 +10,7 @@ const { client } = require("../core/main")
  * @param {string} title The resolved title (optional, for messaging).
  */
 module.exports = {
-    playTrack: async(guildId, query, title) => {
+    playTrack: async (guildId, query, title) => {
         const player = client.players.get(guildId);
         if (!player) return;
 
@@ -28,7 +28,6 @@ module.exports = {
             '--no-playlist',
             '--no-warnings',
             '--quiet',
-            // '--cookies', 'E:\Programming\github\core-beatzzz\cookies.txt'
         ], { stdio: ['ignore', 'pipe', 'pipe'] });
         yt.stderr.on('data', data => {
             console.error(`yt-dlp error: ${data}`);
@@ -45,6 +44,7 @@ module.exports = {
             '-f', 's16le',
             '-ar', '48000',
             '-ac', '2',
+            // '-af', 'volume=0.1',
             'pipe:1'
         ], { stdio: ['pipe', 'pipe', 'inherit'] });
         ffmpeg.on('error', error => {

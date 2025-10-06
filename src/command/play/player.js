@@ -4,6 +4,11 @@ const { client } = require("../../core/main");
 const { playTrack } = require("../../utils/playTrack");
 const { connectToChannel } = require("../../utils/connectToChannel");
 
+// const guildId = "550389429567750155";
+// const channelId = "1287863586819145828";
+
+// const guildId = "1117823396043034624";
+// const channelId = "1258844274212995073";
 
 
 module.exports = {
@@ -12,11 +17,14 @@ module.exports = {
         name: "play",
         description: "Joins your voice channel and starts playing music"
     },
-    
+
     execute: async (message, args) => {
 
-
         const guildId = message.guild.id;
+        // let guild = client.guilds.cache.get(guildId);
+        // if (!guild) return message.reply("I am not in this guild!");
+        // let voiceChannel = guild.channels.cache.get(channelId);
+        // if (!voiceChannel) return message.reply("I cannot find the specified channel in this guild!");
         const voiceChannel = message.member.voice.channel;
 
         if (!voiceChannel) {
@@ -43,7 +51,7 @@ module.exports = {
             ], { stdio: ['ignore', 'pipe', 'pipe'] });
             let infoData = '';
             info.stdout.on('data', chunk => infoData += chunk);
-            
+
             infoData = await new Promise(resolve => info.on('close', resolve));
             const metadata = JSON.parse(infoData);
             title = metadata.title || title;
@@ -53,7 +61,7 @@ module.exports = {
 
         if (!client.players.has(guildId) || client.players.get(guildId).state.status === AudioPlayerStatus.Idle) {
             try {
-                await connectToChannel(voiceChannel);
+                connectToChannel(voiceChannel);
             } catch (err) {
                 console.error('Failed to join voice channel:', err);
                 return message.reply('Unable to join your voice channel.');
