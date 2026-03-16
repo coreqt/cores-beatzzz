@@ -1,2 +1,2 @@
-# anuj-s-beatzzz
+# cores-beatzzz
 Discord Music bot
