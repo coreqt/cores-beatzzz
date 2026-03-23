@@ -1,20 +1,23 @@
+const dns = require('node:dns');
+dns.setDefaultResultOrder('ipv4first');
 const fs = require('node:fs');
 const path = require('node:path');
 // const { Client } = require('discord.js-selfbot-v13');
+const { Client } = require('discord.js-selfbot-youtsuho-v13');
 // const { GatewayIntentBits } = require('discord.js');
-const {Client, GatewayIntentBits} = require('discord.js');;
+// const {Client, GatewayIntentBits} = require('discord.js');;
 const {startServer} = require('./keepAlive.js');
 
  
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
-    ]
-});
-// const client = new Client();
+// const client = new Client({
+//     intents: [
+//         GatewayIntentBits.Guilds,
+//         GatewayIntentBits.GuildVoiceStates,
+//         GatewayIntentBits.GuildMessages,
+//         GatewayIntentBits.MessageContent
+//     ]
+// });
+const client = new Client();
 
 client.queue = new Map();
 client.connections = new Map();

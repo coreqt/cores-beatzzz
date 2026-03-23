@@ -1,39 +1,62 @@
+const {
+    joinVoiceChannel,
+    createAudioPlayer,
+    entersState,
+    VoiceConnectionStatus,
+    AudioPlayerStatus
+} = require("@discordjs/voice");
 
-const { joinVoiceChannel, createAudioPlayer, entersState, VoiceConnectionStatus, AudioPlayerStatus  } = require("@discordjs/voice");
-const {playTrack} = require('./playTrack');
-
-/**
- * Connects the bot to a voice channel and sets up the audio player.
- * @param {VoiceChannel} voiceChannel The voice channel to join.
- */
 const { client } = require("../core/main");
+const { playTrack } = require("./playTrack");
 
 module.exports = {
-    connectToChannel: async(voiceChannel) => {
+    connectToChannel: async (voiceChannel) => {
+        if (!voiceChannel) throw new Error("No voice channel provided");
+
+        const guildId = voiceChannel.guild.id;
+
         const connection = joinVoiceChannel({
             channelId: voiceChannel.id,
-            guildId: voiceChannel.guild.id,
-            adapterCreator: voiceChannel.guild.voiceAdapterCreator
+            guildId,
+            adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+            selfDeaf: false,
         });
+
+        connection.on("stateChange", (oldState, newState) => {
+            console.log(`[Voice ${guildId}] ${oldState.status} -> ${newState.status}`);
+        });
+
+        connection.on("error", console.error);
+
+        connection.on(VoiceConnectionStatus.Disconnected, async () => {
+            try {
+                await Promise.race([
+                    entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+                    entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+                ]);
+            } catch {
+                connection.destroy();
+            }
+        });
+
         try {
-            // Wait for the connection to become ready
-            await entersState(connection, VoiceConnectionStatus.Ready, 20_000);
-        } catch (error) {
+            await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
+        } catch (err) {
             connection.destroy();
-            throw error;
+            throw err;
         }
+
         const player = createAudioPlayer();
         connection.subscribe(player);
-        const guildId = voiceChannel.guild.id;
+
         client.connections.set(guildId, connection);
         client.players.set(guildId, player);
 
-        // When a track finishes (Idle), play the next one or leave if queue is empty
-        player.on(AudioPlayerStatus.Idle, () => {
+        player.on(AudioPlayerStatus.Idle, async() => {
             const guildQueue = client.queue.get(guildId);
             const textChannel = client.textChannels.get(guildId);
+
             if (!guildQueue || guildQueue.length === 0) {
-                // No more songs: disconnect and clean up
                 connection.destroy();
                 client.queue.delete(guildId);
                 client.players.delete(guildId);
@@ -42,34 +65,31 @@ module.exports = {
                 client.textChannels.delete(guildId);
                 return;
             }
-            // Dequeue next song and play it
+
             const next = guildQueue.shift();
-            if (textChannel) {
-                textChannel.send(`▶ Now playing: **${next.title || next.query}**`);
-            }
+            if (textChannel) textChannel.send(`▶ Now playing: **${next.title || next.query}**`);
             playTrack(guildId, next.query, next.title);
         });
 
-        // Handle audio player errors (skip to next if any)
-        player.on('error', error => {
-            console.error(`Audio player error: ${error.message}`);
-            const guildQueue = queue.get(guildId);
-            const textChannel = textChannels.get(guildId);
+        player.on("error", (error) => {
+            console.error("Audio player error:", error);
+            const guildQueue = client.queue.get(guildId);
+            const textChannel = client.textChannels.get(guildId);
+
             if (guildQueue && guildQueue.length > 0) {
                 const next = guildQueue.shift();
-                if (textChannel) {
-                    textChannel.send(`⚠️ Error with current track. Skipping to next: **${next.title || next.query}**`);
-                }
+                if (textChannel) textChannel.send(`⚠️ Skipping error track: **${next.title || next.query}**`);
                 playTrack(guildId, next.query, next.title);
             } else {
                 connection.destroy();
-                client.queue.delete(guildId);0
+                client.queue.delete(guildId);
                 client.players.delete(guildId);
                 client.connections.delete(guildId);
                 client.processes.delete(guildId);
                 client.textChannels.delete(guildId);
             }
         });
-        return;
+
+        return connection;
     }
-}
+};

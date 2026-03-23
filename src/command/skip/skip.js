@@ -7,7 +7,7 @@ module.exports = {
         description: "skips the current track"
     }, 
     execute: async (message, args) => {
-        const gulidId = message.guild.id;
+        const guildId = message.guild.id;
 
         const player = client.players.get(guildId);
         if (!player || player.state.status !== AudioPlayerStatus.Playing) {
